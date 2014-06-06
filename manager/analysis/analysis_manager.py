@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 #
-# analysis_manager.py
+# ~/analysis/analysis_manager.py
 #
 #
 
@@ -19,6 +19,7 @@ USER = 'ylab'
 PASS = 'ylab920'
 HOST_PCAP_PATH = '/home/ylab/MDA/data/out.pcap'
 LOCAL_PCAP_PATH = '/home/iouser/analysis/out.pcap'
+PCAP_SCRIPT_PATH = '/home/ylab/MDA/bin/make_result.py'
 
 #SSH接続
 def sshconnect(host,user,pswd):
@@ -53,7 +54,7 @@ if __name__ == '__main__':
     
     #検体実行
     vssh.exec_command('chmod +x '+REMOTE_PATH)
-    vssh.exec_command(REMOTE_PATH)
+    vssh.exec_command('echo 8ik,.lo9 | sudo '+REMOTE_PATH)
     
     time.sleep(int(exetime))
     p.terminate()
@@ -62,3 +63,6 @@ if __name__ == '__main__':
     #ホストにSSH,pcap転送
     hssh=sshconnect(HOST,USER,PASS)
     filesftp(hssh,LOCAL_PCAP_PATH,HOST_PCAP_PATH)
+
+    #ホストでpcap解析
+    hssh.exec_command(PCAP_SCRIPT_PATH+' '+md5)
