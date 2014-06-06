@@ -14,7 +14,7 @@ PASS = '8ik,.lo9'
 
 try:
     filepath = sys.argv[1]
-    time = sys.argv[2]
+    exetime = sys.argv[2]
 except:
     print "./analysis [検体パス(managerの)] [実行時間]"
 
@@ -31,7 +31,7 @@ command = "echo koidekun |sudo -S ./analysis_manager.py %s %s" % (time,filepath)
 ssh.exec_command(command)
 
 #Ctrl-Cで強制終了 count秒で正常終了
-count = time + 30
+count = exetime + 30
 
 print "強制終了 は Hit Ctrl-C"
 try:
