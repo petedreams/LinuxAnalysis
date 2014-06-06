@@ -2,7 +2,8 @@
 # -*- coding: utf-8 -*-
 
 ##
-## 実行方法 "./analysis.py 検体パス 実行時間"
+## ~/MDA/bin/analysis.py
+## 実行方法 "./analysis.py [検体パス(manager内)] [実行時間]"
 ##
 
 import subprocess,paramiko,sys,time
@@ -25,7 +26,7 @@ if __name__ == '__main__':
         filepath = sys.argv[1]
         exetime = sys.argv[2]
     except:
-        print "./analysis [検体パス(managerの)] [実行時間]"
+        print "./analysis [検体パス(manager内)] [実行時間]"
     
     #vm終了・SS復元・起動
     subprocess.Popen(["VBoxManage","controlvm","guest-ubuntu10.04","poweroff"]).wait()
@@ -33,7 +34,7 @@ if __name__ == '__main__':
     subprocess.call(["VBoxManage","startvm","guest-ubuntu10.04"])
     
     #guestのネット接続待ち
-    time.sleep(10)
+    #time.sleep(10)
 
     #SSHでマネージャ接続
     ssh=sshconnect(HOST,USER,PASS)
