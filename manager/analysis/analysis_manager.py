@@ -54,7 +54,7 @@ if __name__ == '__main__':
     
     #検体実行
     vssh.exec_command('chmod +x '+REMOTE_PATH)
-    vssh.exec_command('echo 8ik,.lo9 | sudo '+REMOTE_PATH)
+    vssh.exec_command('echo 8ik,.lo9 | sudo -S '+REMOTE_PATH)
     
     time.sleep(int(exetime))
     p.terminate()
