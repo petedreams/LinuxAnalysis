@@ -4,9 +4,10 @@
 ##
 ## ~/MDA/bin/analysis.py
 ## 実行方法 "./analysis.py [検体パス(manager内)] [実行時間]"
+## 検体パスの子ディレクトリは解析不可能
 ##
 
-import subprocess,paramiko,sys,time
+import subprocess,paramiko,sys,time,os
 
 #manager
 HOST = '192.168.100.50'
@@ -20,6 +21,15 @@ def sshconnect(host,user,pswd):
     obj.connect(host,username=user,password=pswd)
     return obj
 
+def analysis(malware_path,exetime):
+    command = "echo 8ik,.lo9 |sudo -S "+SCRIPT_PATH+" %s %s" % (malware_path,exetime)
+    ssh.exec_command(command)
+
+    #vm終了・SS復元・起動
+    subprocess.Popen(["VBoxManage","controlvm","guest-ubuntu10.04","poweroff"]).wait()
+    subprocess.Popen(["VBoxManage","snapshot","guest-ubuntu10.04","restore","GUEST"]).wait()
+    subprocess.call(["VBoxManage","startvm","guest-ubuntu10.04"])
+
 if __name__ == '__main__':
 
     try:
@@ -28,21 +38,24 @@ if __name__ == '__main__':
     except:
         print "./analysis [検体パス(manager内)] [実行時間]"
     
-    #vm終了・SS復元・起動
-    subprocess.Popen(["VBoxManage","controlvm","guest-ubuntu10.04","poweroff"]).wait()
-    subprocess.Popen(["VBoxManage","snapshot","guest-ubuntu10.04","restore","GUEST"]).wait()
-    subprocess.call(["VBoxManage","startvm","guest-ubuntu10.04"])
     
-    #guestのネット接続待ち
-    #time.sleep(10)
-
     #SSHでマネージャ接続
     ssh=sshconnect(HOST,USER,PASS)
-    command = "echo 8ik,.lo9 |sudo -S "+SCRIPT_PATH+" %s %s" % (filepath,exetime)
-    ssh.exec_command(command)
-    
+
+    #検体パス内の検体を絶対パスを取得
+    stdin, stdout, stderr = ssh.exec_command('find `pwd `cd '+filepath+'`` -type f -maxdepth 1 -mindepth 1| grep -v "\/\."')
+    malware_path = []#検体絶対パス
+    for l in stdout:
+        malware_path.append(l.strip('\n'))
+    malware_num = len(malware_path)#検体数
+
+    print "解析中..."
+    for m in malware_path:
+        print os.path.basename(m)
+        analysis(m,exetime)
+
     #Ctrl-Cで強制終了 count秒で正常終了
-    count = int(exetime) + 30
+    count = int(exetime)*malware_num + 30
     
     print "強制終了 は Hit Ctrl-C"
     try:
@@ -55,5 +68,5 @@ if __name__ == '__main__':
     #   ここで終了処理
     #
         print('強制終了しました。')
-    
+
     ssh.close()
