@@ -22,13 +22,14 @@ def sshconnect(host,user,pswd):
     return obj
 
 def analysis(malware_path,exetime,ssh):
-    command = "echo 8ik,.lo9 |sudo -S "+SCRIPT_PATH+" %s %s" % (malware_path,exetime)
-    ssh.exec_command(command)
 
     #vm終了・SS復元・起動
     subprocess.Popen(["VBoxManage","controlvm","guest-ubuntu10.04","poweroff"]).wait()
     subprocess.Popen(["VBoxManage","snapshot","guest-ubuntu10.04","restore","GUEST"]).wait()
     subprocess.call(["VBoxManage","startvm","guest-ubuntu10.04"])
+
+    command = "echo 8ik,.lo9 |sudo -S "+SCRIPT_PATH+" %s %s" % (malware_path,exetime)
+    ssh.exec_command(command)
 
     #Ctrl-Cで強制終了 count秒で正常終了
     count = int(exetime) + 30
