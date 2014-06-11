@@ -39,7 +39,8 @@ if __name__ == '__main__':
     
     filepath = sys.argv[1]
     exetime = sys.argv[2]
-    md5 = hashlib.md5(filepath).hexdigest()
+    f = open(filepath)
+    sha = hashlib.sha256(f.read()).hexdigest()
     
     #iptables実行
     subprocess.Popen(["sudo","sh","iptables_manager.sh"]).wait()
@@ -65,4 +66,4 @@ if __name__ == '__main__':
     filesftp(hssh,LOCAL_PCAP_PATH,HOST_PCAP_PATH)
 
     #ホストでpcap解析
-    hssh.exec_command(PCAP_SCRIPT_PATH+' '+md5)
+    hssh.exec_command(PCAP_SCRIPT_PATH+' '+sha)
