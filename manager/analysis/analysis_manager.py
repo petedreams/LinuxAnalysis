@@ -5,7 +5,7 @@
 #
 #
 
-import subprocess,paramiko,sys,os,time,hashlib
+import subprocess,paramiko,sys,os,time,hashlib,datetime
 
 #victim
 V_HOST = '192.168.228.240'
@@ -36,7 +36,8 @@ def filesftp(obj,localpath,remotepath):
 
 if __name__ == '__main__':
 
-    
+    d = datetime.datetime.today()
+    starttime = d.strftime("%Y%m%d_%H_%M")
     filepath = sys.argv[1]
     exetime = sys.argv[2]
     f = open(filepath)
@@ -66,4 +67,4 @@ if __name__ == '__main__':
     filesftp(hssh,LOCAL_PCAP_PATH,HOST_PCAP_PATH)
 
     #ホストでpcap解析
-    hssh.exec_command(PCAP_SCRIPT_PATH+' '+sha)
+    hssh.exec_command(PCAP_SCRIPT_PATH+' '+sha+' '+starttime+' '+exetime)
