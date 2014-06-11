@@ -3,7 +3,7 @@
 
 ##
 ## ~/MDA/bin/analysis.py
-## 実行方法 "./analysis.py [検体パス(manager内)] [実行時間(秒)]"
+## 実行方法 "./analysis.py [検体パス(manager内)] [実行時間(秒)])"
 ## 検体パスの子ディレクトリは解析不可能
 ##
 
@@ -23,16 +23,14 @@ def sshconnect(host,user,pswd):
 
 def analysis(malware_path,exetime,ssh):
 
-    #vm終了・SS復元・起動
-    subprocess.Popen(["VBoxManage","controlvm","guest-ubuntu10.04","poweroff"]).wait()
-    subprocess.Popen(["VBoxManage","snapshot","guest-ubuntu10.04","restore","GUEST"]).wait()
-    subprocess.call(["VBoxManage","startvm","guest-ubuntu10.04"])
+    #vm起動
+    subprocess.Popen(["VBoxManage","startvm","guest-ubuntu10.04"]).wait()
 
     command = "echo 8ik,.lo9 |sudo -S "+SCRIPT_PATH+" %s %s" % (malware_path,exetime)
     ssh.exec_command(command)
 
     #Ctrl-Cで強制終了 count秒で正常終了
-    count = int(exetime) + 30
+    count = int(exetime) + 20
 
     print "強制終了 は Hit Ctrl-C"
     try:
@@ -46,6 +44,10 @@ def analysis(malware_path,exetime,ssh):
     #
         print('強制終了しました。')
 
+    #vm終了・復元
+    subprocess.Popen(["VBoxManage","controlvm","guest-ubuntu10.04","poweroff"]).wait()
+    subprocess.Popen(["VBoxManage","snapshot","guest-ubuntu10.04","restore","GUEST"]).wait()
+
 if __name__ == '__main__':
 
     try:
@@ -53,6 +55,7 @@ if __name__ == '__main__':
         exetime = sys.argv[2]
     except:
         print "./analysis [検体パス(manager内)] [実行時間(秒)]"
+        quit()
     
     #SSHでマネージャ接続
     ssh=sshconnect(HOST,USER,PASS)
@@ -64,9 +67,13 @@ if __name__ == '__main__':
         malware_path.append(l.strip('\n'))
     malware_num = len(malware_path)#検体数
 
-    print "解析中..."
-    for m in malware_path:
-        print os.path.basename(m)
-        analysis(m,exetime,ssh)
-
+    if not malware_num:
+        print "このディレクトリには検体がありません"
+        quit()
+    else:
+        print "解析中..."
+        for m in malware_path:
+            print "----<< SHA256 : "+os.path.basename(m)+" >>----"
+            analysis(m,exetime,ssh)
+        
     ssh.close()
