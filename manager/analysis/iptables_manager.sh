@@ -36,20 +36,19 @@ echo 1 > /proc/sys/net/ipv4/ip_forward
 ###
 #ssh -> myhost
 ###
-#/sbin/iptables -A INPUT -p tcp ! --syn -m state --state NEW -j DROP
-/sbin/iptables -A INPUT -p tcp -m state --state NEW -s $trusthost -d $my_ip --dport 22 -j ACCEPT
-/sbin/iptables -A INPUT -p tcp -m state --state NEW -s $victim -d $my_ip --dport 22 -j ACCEPT
+/sbin/iptables -A INPUT -p tcp --syn -m state --state NEW -s $trusthost -d $my_ip --dport 22 -j ACCEPT
+#/sbin/iptables -A INPUT -p tcp -m state --state NEW -s $victim -d $my_ip --dport 22 -j ACCEPT
 
 ###
 #ssh myhost -> 
 ###
-/sbin/iptables -A OUTPUT -p tcp -m state --state NEW -d $trusthost -s $my_ip --dport 22 -j ACCEPT
-/sbin/iptables -A OUTPUT -p tcp -m state --state NEW -d $victim -s $my_ip --dport 22 -j ACCEPT
+/sbin/iptables -A OUTPUT -p tcp --syn -m state --state NEW -d $trusthost -s $my_ip --dport 22 -j ACCEPT
+/sbin/iptables -A OUTPUT -p tcp --syn -m state --state NEW -d $victim -s $my_ip --dport 22 -j ACCEPT
 
 ###
 #victimOS -> myhost
 ###
-/sbin/iptables -A INPUT -s $victim -d $my_internal -j ACCEPT
+#/sbin/iptables -A INPUT -s $victim -d $my_internal -j DROP
 
 ###
 #Masquerade

@@ -65,6 +65,7 @@ if __name__ == '__main__':
     #ホストにSSH,pcap転送
     hssh=sshconnect(HOST,USER,PASS)
     filesftp(hssh,LOCAL_PCAP_PATH,HOST_PCAP_PATH)
+    subprocess.call(["mv",LOCAL_PCAP_PATH,"/home/iouser/analysis/"+sha+"_"+starttime])
 
     #ホストでpcap解析
     hssh.exec_command(PCAP_SCRIPT_PATH+' '+sha+' '+starttime+' '+exetime)
